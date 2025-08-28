@@ -10,13 +10,14 @@ class TimeDisplayAddon {
             fontUrl: "https://fonts.cdnfonts.com/css/anurati",
             fontFamily: "Anurati, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
             textColor: "#FFFFFF",
-            fontSize: 48,
             timeFormat: "24h",
             showSeconds: true
         };
         
         this.timeElement = null;
         this.timeInterval = null;
+        this.resizeTimeout = null;
+        this.isCalculating = false;
         
         this.init();
     }
@@ -86,12 +87,6 @@ class TimeDisplayAddon {
             hasChanges = true;
         }
         
-        // Taille de fonte - seulement si changée
-        if (oldSettings.fontSize !== newSettings.fontSize) {
-            this.timeElement.style.fontSize = newSettings.fontSize + 'px';
-            console.log('📏 Taille de fonte mise à jour:', newSettings.fontSize + 'px');
-            hasChanges = true;
-        }
         
         // URL de fonte - seulement si changée (évite rechargement inutile)
         if (oldSettings.fontUrl !== newSettings.fontUrl) {
@@ -112,7 +107,6 @@ class TimeDisplayAddon {
         // Appliquer tous les paramètres (pour initialisation)
         this.timeElement.style.color = this.settings.textColor;
         this.timeElement.style.fontFamily = this.settings.fontFamily;
-        this.timeElement.style.fontSize = this.settings.fontSize + 'px';
         this.loadCustomFont();
     }
 
@@ -199,20 +193,94 @@ class TimeDisplayAddon {
     }
 
     setupEventListeners() {
-        // Pas besoin d'event listeners pour une taille fixe
+        // Redimensionnement avec debounce
+        window.addEventListener('resize', () => {
+            if (this.resizeTimeout) {
+                clearTimeout(this.resizeTimeout);
+            }
+            this.resizeTimeout = setTimeout(() => {
+                this.calculateOptimalFontSize();
+            }, 150);
+        });
+
+        // Recalcul périodique pour s'assurer que tout est optimal
+        setInterval(() => {
+            if (!this.isCalculating) {
+                this.calculateOptimalFontSize();
+            }
+        }, 30000); // Toutes les 30 secondes
     }
 
     calculateOptimalFontSize() {
-        if (!this.timeElement) return;
+        if (!this.timeElement || this.isCalculating) return;
         
-        // Utiliser la taille configurée dans les paramètres
-        this.timeElement.style.fontSize = this.settings.fontSize + 'px';
-        console.log(`📏 Taille de fonte configurée: ${this.settings.fontSize}px`);
+        this.isCalculating = true;
+
+        const container = this.timeElement.parentElement;
+        if (!container) {
+            this.isCalculating = false;
+            return;
+        }
+
+        const containerRect = container.getBoundingClientRect();
+        const maxWidth = containerRect.width;
+        const maxHeight = containerRect.height;
+
+        if (maxWidth <= 0 || maxHeight <= 0) {
+            this.isCalculating = false;
+            return;
+        }
+
+        // Algorithme de recherche binaire optimisé pour le text fitting
+        let minFontSize = 6; // Taille minimum lisible
+        let maxFontSize = Math.min(maxWidth, maxHeight); // Limite supérieure raisonnable
+        let currentFontSize = (minFontSize + maxFontSize) / 2;
+        let iterations = 0;
+        const maxIterations = 20; // Limite pour éviter les boucles infinies
+
+        while (iterations < maxIterations) {
+            // Appliquer la taille de test
+            this.timeElement.style.fontSize = `${currentFontSize}px`;
+            
+            // Mesurer les dimensions après le changement de font-size
+            const textRect = this.timeElement.getBoundingClientRect();
+            const widthDifference = maxWidth - textRect.width;
+            const heightDifference = maxHeight - textRect.height;
+
+            // Si le texte s'ajuste parfaitement (tolérance de 1px), on arrête
+            if (Math.abs(widthDifference) <= 1 && Math.abs(heightDifference) <= 1) {
+                break;
+            }
+
+            // Si le texte est trop grand, réduire la taille max
+            if (widthDifference < 0 || heightDifference < 0) {
+                maxFontSize = currentFontSize;
+            } 
+            // Si le texte est trop petit, augmenter la taille min
+            else {
+                minFontSize = currentFontSize;
+            }
+
+            // Calculer la nouvelle taille à tester
+            currentFontSize = (minFontSize + maxFontSize) / 2;
+            iterations++;
+        }
+
+        // Appliquer la taille optimale trouvée avec marge de sécurité
+        const finalSize = Math.max(Math.floor(currentFontSize) - 2, 6);
+        this.timeElement.style.fontSize = `${finalSize}px`;
+
+        console.log(`📏 Taille de fonte optimale: ${finalSize}px (${iterations} itérations)`);
+        
+        this.isCalculating = false;
     }
 
     destroy() {
         if (this.timeInterval) {
             clearInterval(this.timeInterval);
+        }
+        if (this.resizeTimeout) {
+            clearTimeout(this.resizeTimeout);
         }
     }
 }
