@@ -16,8 +16,6 @@ class TimeDisplayAddon {
         
         this.timeElement = null;
         this.timeInterval = null;
-        this.resizeTimeout = null;
-        this.isCalculating = false;
         
         this.init();
     }
@@ -146,94 +144,20 @@ class TimeDisplayAddon {
     }
 
     setupEventListeners() {
-        // Redimensionnement avec debounce
-        window.addEventListener('resize', () => {
-            if (this.resizeTimeout) {
-                clearTimeout(this.resizeTimeout);
-            }
-            this.resizeTimeout = setTimeout(() => {
-                this.calculateOptimalFontSize();
-            }, 150);
-        });
-
-        // Recalcul périodique pour s'assurer que tout est optimal
-        setInterval(() => {
-            if (!this.isCalculating) {
-                this.calculateOptimalFontSize();
-            }
-        }, 10000); // Toutes les 10 secondes
+        // Pas besoin d'event listeners pour une taille fixe
     }
 
     calculateOptimalFontSize() {
-        if (!this.timeElement || this.isCalculating) return;
+        if (!this.timeElement) return;
         
-        this.isCalculating = true;
-
-        const container = this.timeElement.parentElement;
-        if (!container) {
-            this.isCalculating = false;
-            return;
-        }
-
-        const containerRect = container.getBoundingClientRect();
-        const maxWidth = containerRect.width;
-        const maxHeight = containerRect.height;
-
-        if (maxWidth <= 0 || maxHeight <= 0) {
-            this.isCalculating = false;
-            return;
-        }
-
-        // Algorithme de recherche binaire optimisé selon les bonnes pratiques modernes
-        let minFontSize = 6; // Taille minimum lisible
-        let maxFontSize = Math.min(maxWidth, maxHeight); // Limite supérieure raisonnable
-        let currentFontSize = (minFontSize + maxFontSize) / 2;
-        let iterations = 0;
-        const maxIterations = 20; // Limite basée sur les best practices
-
-        while (iterations < maxIterations) {
-            // Appliquer la taille de test
-            this.timeElement.style.fontSize = `${currentFontSize}px`;
-            
-            // Mesurer les dimensions après le changement de font-size
-            const textRect = this.timeElement.getBoundingClientRect();
-            const widthDifference = maxWidth - textRect.width;
-            const heightDifference = maxHeight - textRect.height;
-
-            // Si le texte s'ajuste parfaitement (tolérance de 1px), on arrête
-            if (Math.abs(widthDifference) <= 1 && Math.abs(heightDifference) <= 1) {
-                break;
-            }
-
-            // Si le texte est trop grand, réduire la taille max
-            if (widthDifference < 0 || heightDifference < 0) {
-                maxFontSize = currentFontSize;
-            } 
-            // Si le texte est trop petit, augmenter la taille min
-            else {
-                minFontSize = currentFontSize;
-            }
-
-            // Calculer la nouvelle taille à tester
-            currentFontSize = (minFontSize + maxFontSize) / 2;
-            iterations++;
-        }
-
-        // Appliquer la taille optimale trouvée
-        const finalSize = Math.max(Math.floor(currentFontSize), 6);
-        this.timeElement.style.fontSize = `${finalSize}px`;
-
-        console.log(`📏 Taille de fonte optimale: ${finalSize}px (${iterations} itérations)`);
-        
-        this.isCalculating = false;
+        // Taille fixe simple sans logique complexe
+        this.timeElement.style.fontSize = '48px';
+        console.log('📏 Taille de fonte fixe: 48px');
     }
 
     destroy() {
         if (this.timeInterval) {
             clearInterval(this.timeInterval);
-        }
-        if (this.resizeTimeout) {
-            clearTimeout(this.resizeTimeout);
         }
     }
 }
