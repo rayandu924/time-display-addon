@@ -1,7 +1,7 @@
 {
   "name": "Time Display",
-  "version": "3.2.1",
-  "description": "Affichage de l'heure en temps réel avec taille maximale adaptative - 80% de l'écran, minimaliste et ultra-stable",
+  "version": "3.2.2",
+  "description": "Affichage de l'heure en temps réel avec taille maximale pure - 100% de la plus petite dimension, ultra-simple et stable",
   "author": "MyWallpaper",
   "icon": "🕐",
   "type": "widget",

@@ -184,8 +184,8 @@ class TimeDisplayAddon {
     applyResponsiveSize() {
         if (!this.timeElement) return;
         
-        // Prendre 100% de l'espace disponible - base sur la plus petite dimension
-        const fontSize = Math.min(this.dimensions.width, this.dimensions.height) * 0.8;
+        // 100% de la plus petite dimension
+        const fontSize = Math.min(this.dimensions.width, this.dimensions.height);
         
         this.timeElement.style.fontSize = `${fontSize}px`;
         
