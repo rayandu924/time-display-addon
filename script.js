@@ -184,33 +184,46 @@ class TimeDisplayAddon {
             return;
         }
 
-        // Algorithme de recherche binaire identique à date-display-addon
-        let minSize = 1;
-        let maxSize = Math.min(maxWidth, maxHeight);
-        let optimalSize = minSize;
+        // Algorithme de recherche binaire optimisé selon les bonnes pratiques modernes
+        let minFontSize = 6; // Taille minimum lisible
+        let maxFontSize = Math.min(maxWidth, maxHeight); // Limite supérieure raisonnable
+        let currentFontSize = (minFontSize + maxFontSize) / 2;
+        let iterations = 0;
+        const maxIterations = 20; // Limite basée sur les best practices
 
-        const testText = this.timeElement.textContent || "00:00:00";
-
-        // Recherche binaire pour trouver la taille optimale
-        while (minSize <= maxSize) {
-            const midSize = Math.floor((minSize + maxSize) / 2);
-            this.timeElement.style.fontSize = midSize + 'px';
-
-            const textRect = this.timeElement.getBoundingClientRect();
+        while (iterations < maxIterations) {
+            // Appliquer la taille de test
+            this.timeElement.style.fontSize = `${currentFontSize}px`;
             
-            if (textRect.width <= maxWidth && textRect.height <= maxHeight) {
-                optimalSize = midSize;
-                minSize = midSize + 1;
-            } else {
-                maxSize = midSize - 1;
+            // Mesurer les dimensions après le changement de font-size
+            const textRect = this.timeElement.getBoundingClientRect();
+            const widthDifference = maxWidth - textRect.width;
+            const heightDifference = maxHeight - textRect.height;
+
+            // Si le texte s'ajuste parfaitement (tolérance de 1px), on arrête
+            if (Math.abs(widthDifference) <= 1 && Math.abs(heightDifference) <= 1) {
+                break;
             }
+
+            // Si le texte est trop grand, réduire la taille max
+            if (widthDifference < 0 || heightDifference < 0) {
+                maxFontSize = currentFontSize;
+            } 
+            // Si le texte est trop petit, augmenter la taille min
+            else {
+                minFontSize = currentFontSize;
+            }
+
+            // Calculer la nouvelle taille à tester
+            currentFontSize = (minFontSize + maxFontSize) / 2;
+            iterations++;
         }
 
-        // Appliquer la taille optimale avec une petite marge de sécurité
-        const finalSize = Math.max(optimalSize - 2, 1);
-        this.timeElement.style.fontSize = finalSize + 'px';
+        // Appliquer la taille optimale trouvée
+        const finalSize = Math.max(Math.floor(currentFontSize), 6);
+        this.timeElement.style.fontSize = `${finalSize}px`;
 
-        console.log(`📏 Taille de fonte optimale: ${finalSize}px`);
+        console.log(`📏 Taille de fonte optimale: ${finalSize}px (${iterations} itérations)`);
         
         this.isCalculating = false;
     }
