@@ -1,7 +1,7 @@
 /**
- * Time Display Addon - Version simple et robuste
- * Affichage de l'heure en temps réel avec auto-sizing CSS pur
- * Utilise CSS clamp() pour un redimensionnement fluide et compatible avec les iframes
+ * Time Display Addon - Simple Responsive Approach
+ * Affichage de l'heure en temps réel avec taille basée sur les dimensions de la fenêtre
+ * Approche ultra-simple et stable pour les iframes
  */
 
 class TimeDisplayAddon {
@@ -16,6 +16,7 @@ class TimeDisplayAddon {
         
         this.timeElement = null;
         this.timeInterval = null;
+        this.dimensions = { width: 0, height: 0 };
         
         this.init();
     }
@@ -25,9 +26,11 @@ class TimeDisplayAddon {
             this.timeElement = document.getElementById('currentTime');
             if (this.timeElement) {
                 console.log('🚀 Time Display - Initialisation de l\'addon');
+                this.updateDimensions();
+                this.setupEventListeners();
                 this.loadCustomFont();
                 this.startTimeUpdates();
-                this.applySettings();
+                this.applyResponsiveSize();
             } else {
                 console.error('❌ Time Display - Element currentTime non trouvé');
             }
@@ -63,7 +66,8 @@ class TimeDisplayAddon {
         const needsRecalc = this.applyChangedSettings(oldSettings, this.settings);
         this.updateTimeDisplay();
         
-        // Les styles CSS s'occupent automatiquement du sizing
+        this.applySettings();
+        this.applyResponsiveSize();
     }
 
     applyChangedSettings(oldSettings, newSettings) {
@@ -103,14 +107,11 @@ class TimeDisplayAddon {
         return needsFontRecalc;
     }
 
-    // Méthode legacy pour initialisation complète
     applySettings() {
         if (!this.timeElement) return;
 
-        // Appliquer tous les paramètres (pour initialisation)
-        this.timeElement.style.color = this.settings.textColor;
         this.timeElement.style.fontFamily = this.settings.fontFamily;
-        this.loadCustomFont();
+        this.timeElement.style.color = this.settings.textColor;
     }
 
     loadCustomFont() {
@@ -129,7 +130,17 @@ class TimeDisplayAddon {
         fontLink.setAttribute('data-font-link', 'time-addon');
         document.head.appendChild(fontLink);
 
-        // La fonte se chargera automatiquement avec CSS clamp()
+        fontLink.onload = () => {
+            console.log('✅ Custom font loaded');
+            this.applySettings();
+            this.applyResponsiveSize();
+        };
+        
+        fontLink.onerror = () => {
+            console.warn('❌ Font failed to load');
+            this.applySettings();
+            this.applyResponsiveSize();
+        };
     }
 
     startTimeUpdates() {
@@ -190,9 +201,32 @@ class TimeDisplayAddon {
         console.log(`🕐 Time Display - Heure mise à jour: "${timeString}"`);
     }
 
-    // Plus besoin d'event listeners pour le resize - CSS clamp() gère tout
-
-    // Plus besoin de calcul manuel - CSS clamp() gère l'auto-sizing
+    updateDimensions() {
+        this.dimensions = {
+            width: window.innerWidth,
+            height: window.innerHeight
+        };
+        console.log(`📏 Dimensions mises à jour: ${this.dimensions.width}x${this.dimensions.height}`);
+    }
+    
+    applyResponsiveSize() {
+        if (!this.timeElement) return;
+        
+        // Approche simple : 15% de la largeur de la fenêtre (comme ton exemple)
+        const fontSize = this.dimensions.width * 0.15;
+        
+        this.timeElement.style.fontSize = `${fontSize}px`;
+        this.timeElement.style.lineHeight = '0.9';
+        
+        console.log(`📏 Taille responsive appliquée: ${fontSize}px`);
+    }
+    
+    setupEventListeners() {
+        window.addEventListener('resize', () => {
+            this.updateDimensions();
+            this.applyResponsiveSize();
+        });
+    }
 
     destroy() {
         if (this.timeInterval) {

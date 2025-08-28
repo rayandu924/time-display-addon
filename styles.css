@@ -31,17 +31,15 @@ body {
 }
 
 .time-element {
-    font-size: clamp(1rem, 12vw, 20vh);
+    font-size: 48px;
     font-weight: bold;
     color: #FFFFFF;
     text-align: center;
     white-space: nowrap;
-    line-height: 0.9;
+    line-height: 1;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    width: fit-content;
-    max-width: 95%;
     overflow: hidden;
 }
