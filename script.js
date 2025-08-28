@@ -22,15 +22,25 @@ class TimeDisplayAddon {
     }
 
     init() {
-        document.addEventListener('DOMContentLoaded', () => {
+        const initializeAddon = () => {
             this.timeElement = document.getElementById('currentTime');
             if (this.timeElement) {
+                console.log('🚀 Time Display - Initialisation de l\'addon');
                 this.loadCustomFont();
                 this.startTimeUpdates();
                 this.setupEventListeners();
                 this.calculateOptimalFontSize();
+            } else {
+                console.error('❌ Time Display - Element currentTime non trouvé');
             }
-        });
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeAddon);
+        } else {
+            // DOM déjà chargé, initialiser immédiatement
+            initializeAddon();
+        }
 
         // Support pour les messages de configuration de MyWallpaperHost
         window.addEventListener('message', (event) => {
@@ -95,6 +105,8 @@ class TimeDisplayAddon {
     }
 
     startTimeUpdates() {
+        console.log('⏰ Time Display - Démarrage des mises à jour de l\'heure');
+        
         // Mettre à jour immédiatement
         this.updateTimeDisplay();
         
@@ -102,6 +114,8 @@ class TimeDisplayAddon {
         this.timeInterval = setInterval(() => {
             this.updateTimeDisplay();
         }, 1000);
+        
+        console.log('✅ Time Display - Interval configuré pour mise à jour chaque seconde');
     }
 
     updateTimeDisplay() {
@@ -145,6 +159,7 @@ class TimeDisplayAddon {
         }
 
         this.timeElement.textContent = timeString;
+        console.log(`🕐 Time Display - Heure mise à jour: "${timeString}"`);
     }
 
     setupEventListeners() {
