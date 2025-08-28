@@ -36,10 +36,8 @@ body {
     color: #FFFFFF;
     text-align: center;
     white-space: nowrap;
-    line-height: 1;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    overflow: hidden;
 }

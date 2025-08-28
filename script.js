@@ -63,48 +63,28 @@ class TimeDisplayAddon {
         this.settings = { ...this.settings, ...newSettings };
         
         // Appliquer seulement les changements nécessaires
-        const needsRecalc = this.applyChangedSettings(oldSettings, this.settings);
+        this.applyChangedSettings(oldSettings, this.settings);
         this.updateTimeDisplay();
-        
-        this.applySettings();
         this.applyResponsiveSize();
     }
 
     applyChangedSettings(oldSettings, newSettings) {
-        if (!this.timeElement) return false;
+        if (!this.timeElement) return;
 
-        let hasChanges = false;
-        let needsFontRecalc = false;
-
-        // Couleur du texte - seulement si changée
+        // Couleur du texte
         if (oldSettings.textColor !== newSettings.textColor) {
             this.timeElement.style.color = newSettings.textColor;
-            console.log('🎨 Couleur mise à jour:', newSettings.textColor);
-            hasChanges = true;
         }
         
-        // Famille de fonte - seulement si changée
+        // Famille de fonte
         if (oldSettings.fontFamily !== newSettings.fontFamily) {
             this.timeElement.style.fontFamily = newSettings.fontFamily;
-            console.log('🔤 Famille de fonte mise à jour:', newSettings.fontFamily);
-            hasChanges = true;
-            // CSS clamp() gère automatiquement le sizing
         }
         
-        
-        // URL de fonte - seulement si changée (évite rechargement inutile)
+        // URL de fonte
         if (oldSettings.fontUrl !== newSettings.fontUrl) {
             this.loadCustomFont();
-            console.log('🔗 URL de fonte changée, rechargement:', newSettings.fontUrl);
-            hasChanges = true;
-            // CSS clamp() gère automatiquement le sizing
         }
-
-        if (!hasChanges) {
-            console.log('⚡ Aucun changement visuel, pas de mise à jour CSS');
-        }
-        
-        return needsFontRecalc;
     }
 
     applySettings() {
@@ -131,14 +111,6 @@ class TimeDisplayAddon {
         document.head.appendChild(fontLink);
 
         fontLink.onload = () => {
-            console.log('✅ Custom font loaded');
-            this.applySettings();
-            this.applyResponsiveSize();
-        };
-        
-        fontLink.onerror = () => {
-            console.warn('❌ Font failed to load');
-            this.applySettings();
             this.applyResponsiveSize();
         };
     }
@@ -212,11 +184,10 @@ class TimeDisplayAddon {
     applyResponsiveSize() {
         if (!this.timeElement) return;
         
-        // Approche simple : 15% de la largeur de la fenêtre (comme ton exemple)
-        const fontSize = this.dimensions.width * 0.15;
+        // Prendre 100% de l'espace disponible - base sur la plus petite dimension
+        const fontSize = Math.min(this.dimensions.width, this.dimensions.height) * 0.8;
         
         this.timeElement.style.fontSize = `${fontSize}px`;
-        this.timeElement.style.lineHeight = '0.9';
         
         console.log(`📏 Taille responsive appliquée: ${fontSize}px`);
     }
