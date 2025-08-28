@@ -1,7 +1,7 @@
 {
   "name": "Time Display",
-  "version": "1.0.0",
-  "description": "Affichage de l'heure en temps réel avec système de redimensionnement intelligent - même algorithme que le date display",
+  "version": "3.1.0",
+  "description": "Affichage de l'heure en temps réel avec auto-sizing CSS pur - compatible avec les iframes et plus robuste",
   "author": "MyWallpaper",
   "icon": "🕐",
   "type": "widget",
