@@ -10,6 +10,7 @@ class TimeDisplayAddon {
             fontUrl: "https://fonts.cdnfonts.com/css/anurati",
             fontFamily: "Anurati, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
             textColor: "#FFFFFF",
+            fontSize: 48,
             timeFormat: "24h",
             showSeconds: true
         };
@@ -61,6 +62,9 @@ class TimeDisplayAddon {
         
         // Famille de fonte
         this.timeElement.style.fontFamily = this.settings.fontFamily;
+        
+        // Taille de fonte
+        this.timeElement.style.fontSize = this.settings.fontSize + 'px';
         
         // Charger nouvelle fonte si URL changée
         this.loadCustomFont();
@@ -150,9 +154,9 @@ class TimeDisplayAddon {
     calculateOptimalFontSize() {
         if (!this.timeElement) return;
         
-        // Taille fixe simple sans logique complexe
-        this.timeElement.style.fontSize = '48px';
-        console.log('📏 Taille de fonte fixe: 48px');
+        // Utiliser la taille configurée dans les paramètres
+        this.timeElement.style.fontSize = this.settings.fontSize + 'px';
+        console.log(`📏 Taille de fonte configurée: ${this.settings.fontSize}px`);
     }
 
     destroy() {

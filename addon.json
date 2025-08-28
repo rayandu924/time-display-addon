@@ -26,6 +26,15 @@
       "description": "Couleur de l'affichage de l'heure",
       "default": "#FFFFFF"
     },
+    "fontSize": {
+      "type": "range",
+      "label": "Taille de la police",
+      "description": "Taille de la police en pixels",
+      "default": 48,
+      "min": 12,
+      "max": 200,
+      "step": 2
+    },
     "timeFormat": {
       "type": "select",
       "label": "Format de l'heure",
