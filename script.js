@@ -55,28 +55,64 @@ class TimeDisplayAddon {
     updateSettings(newSettings) {
         console.log('🔧 Time Display - Mise à jour des paramètres:', newSettings);
         
+        // Sauvegarder les anciens paramètres pour comparaison
+        const oldSettings = { ...this.settings };
+        
         // Merger les nouveaux paramètres
         this.settings = { ...this.settings, ...newSettings };
         
-        // Appliquer les changements
-        this.applySettings();
+        // Appliquer seulement les changements nécessaires
+        this.applyChangedSettings(oldSettings, this.settings);
         this.updateTimeDisplay();
         this.calculateOptimalFontSize();
     }
 
+    applyChangedSettings(oldSettings, newSettings) {
+        if (!this.timeElement) return;
+
+        let hasChanges = false;
+
+        // Couleur du texte - seulement si changée
+        if (oldSettings.textColor !== newSettings.textColor) {
+            this.timeElement.style.color = newSettings.textColor;
+            console.log('🎨 Couleur mise à jour:', newSettings.textColor);
+            hasChanges = true;
+        }
+        
+        // Famille de fonte - seulement si changée
+        if (oldSettings.fontFamily !== newSettings.fontFamily) {
+            this.timeElement.style.fontFamily = newSettings.fontFamily;
+            console.log('🔤 Famille de fonte mise à jour:', newSettings.fontFamily);
+            hasChanges = true;
+        }
+        
+        // Taille de fonte - seulement si changée
+        if (oldSettings.fontSize !== newSettings.fontSize) {
+            this.timeElement.style.fontSize = newSettings.fontSize + 'px';
+            console.log('📏 Taille de fonte mise à jour:', newSettings.fontSize + 'px');
+            hasChanges = true;
+        }
+        
+        // URL de fonte - seulement si changée (évite rechargement inutile)
+        if (oldSettings.fontUrl !== newSettings.fontUrl) {
+            this.loadCustomFont();
+            console.log('🔗 URL de fonte changée, rechargement:', newSettings.fontUrl);
+            hasChanges = true;
+        }
+
+        if (!hasChanges) {
+            console.log('⚡ Aucun changement visuel, pas de mise à jour CSS');
+        }
+    }
+
+    // Méthode legacy pour initialisation complète
     applySettings() {
         if (!this.timeElement) return;
 
-        // Couleur du texte
+        // Appliquer tous les paramètres (pour initialisation)
         this.timeElement.style.color = this.settings.textColor;
-        
-        // Famille de fonte
         this.timeElement.style.fontFamily = this.settings.fontFamily;
-        
-        // Taille de fonte
         this.timeElement.style.fontSize = this.settings.fontSize + 'px';
-        
-        // Charger nouvelle fonte si URL changée
         this.loadCustomFont();
     }
 
