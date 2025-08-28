@@ -1,0 +1,26 @@
+<svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond sombre pour simuler un wallpaper -->
+  <rect width="400" height="200" fill="#1a1a1a"/>
+  
+  <!-- Affichage de l'heure en gros -->
+  <text x="200" y="110" 
+        font-family="Arial, sans-serif" 
+        font-size="48" 
+        font-weight="bold" 
+        fill="#FFFFFF" 
+        text-anchor="middle" 
+        dominant-baseline="middle">14:30:25</text>
+        
+  <!-- Petit indicateur en bas -->
+  <text x="200" y="160" 
+        font-family="Arial, sans-serif" 
+        font-size="12" 
+        fill="#888888" 
+        text-anchor="middle" 
+        dominant-baseline="middle">Time Display Addon</text>
+        
+  <!-- Icône horloge stylisée -->
+  <circle cx="50" cy="50" r="20" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+  <line x1="50" y1="50" x2="50" y2="38" stroke="#FFFFFF" stroke-width="2"/>
+  <line x1="50" y1="50" x2="58" y2="50" stroke="#FFFFFF" stroke-width="2"/>
+</svg>

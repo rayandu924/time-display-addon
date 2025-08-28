@@ -1,0 +1,60 @@
+{
+  "name": "Time Display",
+  "version": "1.0.0",
+  "description": "Affichage de l'heure en temps réel avec système de redimensionnement intelligent - même algorithme que le date display",
+  "author": "MyWallpaper",
+  "icon": "🕐",
+  "type": "widget",
+  "settings": {
+    "fontUrl": {
+      "type": "url",
+      "label": "URL de la fonte",
+      "description": "Google Fonts ou URL de fonte personnalisée (laisser vide pour fonte système)",
+      "default": "https://fonts.cdnfonts.com/css/anurati",
+      "placeholder": "https://fonts.googleapis.com/css?family=Roboto"
+    },
+    "fontFamily": {
+      "type": "text",
+      "label": "Famille de fonte",
+      "description": "Nom de la famille de fonte à utiliser",
+      "default": "Anurati, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "placeholder": "Arial, sans-serif"
+    },
+    "textColor": {
+      "type": "color",
+      "label": "Couleur du texte",
+      "description": "Couleur de l'affichage de l'heure",
+      "default": "#FFFFFF"
+    },
+    "timeFormat": {
+      "type": "select",
+      "label": "Format de l'heure",
+      "description": "Format d'affichage de l'heure",
+      "default": "24h",
+      "options": [
+        {
+          "value": "24h",
+          "label": "24 heures (14:30:25)"
+        },
+        {
+          "value": "12h",
+          "label": "12 heures (2:30:25 PM)"
+        },
+        {
+          "value": "12h-no-seconds",
+          "label": "12 heures sans secondes (2:30 PM)"
+        },
+        {
+          "value": "24h-no-seconds",
+          "label": "24 heures sans secondes (14:30)"
+        }
+      ]
+    },
+    "showSeconds": {
+      "type": "boolean",
+      "label": "Afficher les secondes",
+      "description": "Afficher ou masquer les secondes",
+      "default": true
+    }
+  }
+}
