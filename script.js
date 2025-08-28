@@ -23,7 +23,7 @@ class TimeDisplayAddon {
     }
 
     init() {
-        document.addEventListener('DOMContentLoaded', () => {
+        const initializeAddon = () => {
             this.timeElement = document.getElementById('currentTime');
             if (this.timeElement) {
                 this.loadCustomFont();
@@ -31,7 +31,13 @@ class TimeDisplayAddon {
                 this.setupEventListeners();
                 this.calculateOptimalFontSize();
             }
-        });
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeAddon);
+        } else {
+            initializeAddon();
+        }
 
         // Support pour les messages de configuration de MyWallpaperHost
         window.addEventListener('message', (event) => {
