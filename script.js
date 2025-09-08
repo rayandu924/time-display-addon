@@ -1,216 +1,186 @@
-/**
- * Time Display Addon - Simple Responsive Approach
- * Affichage de l'heure en temps réel avec taille basée sur les dimensions de la fenêtre
- * Approche ultra-simple et stable pour les iframes
- */
-
+// ⏰ TIME DISPLAY ADDON - Ultra-Simple Responsive
 class TimeDisplayAddon {
     constructor() {
+        this.container = document.getElementById('timeContainer')
+        this.timeElement = document.getElementById('currentTime')
+        this.dimensions = { width: 0, height: 0 }
+        
+        // Default settings
         this.settings = {
-            fontUrl: "https://fonts.cdnfonts.com/css/anurati",
-            fontFamily: "Anurati, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-            textColor: "#FFFFFF",
-            timeFormat: "24h",
-            showSeconds: true
-        };
-        
-        this.timeElement = null;
-        this.timeInterval = null;
-        this.dimensions = { width: 0, height: 0 };
-        
-        this.init();
-    }
-
-    init() {
-        const initializeAddon = () => {
-            this.timeElement = document.getElementById('currentTime');
-            if (this.timeElement) {
-                console.log('🚀 Time Display - Initialisation de l\'addon');
-                this.updateDimensions();
-                this.setupEventListeners();
-                this.loadCustomFont();
-                this.startTimeUpdates();
-                this.applyResponsiveSize();
-            } else {
-                console.error('❌ Time Display - Element currentTime non trouvé');
-            }
-        };
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeAddon);
-        } else {
-            // DOM déjà chargé, initialiser immédiatement
-            initializeAddon();
-        }
-
-        // Support pour les messages de configuration de MyWallpaperHost
-        window.addEventListener('message', (event) => {
-            if (event.data && event.data.type === 'SETTINGS_UPDATE') {
-                this.updateSettings(event.data.settings);
-            } else if (event.data && event.data.type === 'CONFIG_UPDATE') {
-                this.updateSettings(event.data.config);
-            }
-        });
-    }
-
-    updateSettings(newSettings) {
-        console.log('🔧 Time Display - Mise à jour des paramètres:', newSettings);
-        
-        // Sauvegarder les anciens paramètres pour comparaison
-        const oldSettings = { ...this.settings };
-        
-        // Merger les nouveaux paramètres
-        this.settings = { ...this.settings, ...newSettings };
-        
-        // Appliquer seulement les changements nécessaires
-        this.applyChangedSettings(oldSettings, this.settings);
-        this.updateTimeDisplay();
-        this.applyResponsiveSize();
-    }
-
-    applyChangedSettings(oldSettings, newSettings) {
-        if (!this.timeElement) return;
-
-        // Couleur du texte
-        if (oldSettings.textColor !== newSettings.textColor) {
-            this.timeElement.style.color = newSettings.textColor;
+            fontUrl: 'https://fonts.cdnfonts.com/css/anurati',
+            fontFamily: 'Anurati, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            textColor: '#FFFFFF',
+            language: 'en-US',
+            letterSpacingPercent: 8, // Pourcentage d'espacement entre lettres (8% par défaut pour être plus visible)
+            timeFormat: '24h' // Format 24h ou 12h
         }
         
-        // Famille de fonte
-        if (oldSettings.fontFamily !== newSettings.fontFamily) {
-            this.timeElement.style.fontFamily = newSettings.fontFamily;
-        }
-        
-        // URL de fonte
-        if (oldSettings.fontUrl !== newSettings.fontUrl) {
-            this.loadCustomFont();
-        }
+        this.updateDimensions()
+        this.loadCustomFont()
+        this.setupEventListeners()
+        this.startUpdating()
+        this.applyResponsiveSize()
     }
-
-    applySettings() {
-        if (!this.timeElement) return;
-
-        this.timeElement.style.fontFamily = this.settings.fontFamily;
-        this.timeElement.style.color = this.settings.textColor;
-    }
-
-    loadCustomFont() {
-        if (!this.settings.fontUrl) return;
-
-        // Supprimer ancien lien de fonte
-        const existingFontLink = document.querySelector('link[data-font-link="time-addon"]');
-        if (existingFontLink) {
-            existingFontLink.remove();
-        }
-
-        // Ajouter nouveau lien de fonte
-        const fontLink = document.createElement('link');
-        fontLink.rel = 'stylesheet';
-        fontLink.href = this.settings.fontUrl;
-        fontLink.setAttribute('data-font-link', 'time-addon');
-        document.head.appendChild(fontLink);
-
-        fontLink.onload = () => {
-            this.applyResponsiveSize();
-        };
-    }
-
-    startTimeUpdates() {
-        console.log('⏰ Time Display - Démarrage des mises à jour de l\'heure');
-        
-        // Mettre à jour immédiatement
-        this.updateTimeDisplay();
-        
-        // Puis mettre à jour chaque seconde
-        this.timeInterval = setInterval(() => {
-            this.updateTimeDisplay();
-        }, 1000);
-        
-        console.log('✅ Time Display - Interval configuré pour mise à jour chaque seconde');
-    }
-
-    updateTimeDisplay() {
-        if (!this.timeElement) return;
-
-        const now = new Date();
-        let timeString = '';
-
-        switch (this.settings.timeFormat) {
-            case '12h':
-                timeString = now.toLocaleTimeString('en-US', {
-                    hour12: true,
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    second: this.settings.showSeconds ? '2-digit' : undefined
-                });
-                break;
-            case '12h-no-seconds':
-                timeString = now.toLocaleTimeString('en-US', {
-                    hour12: true,
-                    hour: 'numeric',
-                    minute: '2-digit'
-                });
-                break;
-            case '24h-no-seconds':
-                timeString = now.toLocaleTimeString('en-US', {
-                    hour12: false,
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                break;
-            case '24h':
-            default:
-                timeString = now.toLocaleTimeString('en-US', {
-                    hour12: false,
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: this.settings.showSeconds ? '2-digit' : undefined
-                });
-                break;
-        }
-
-        this.timeElement.textContent = timeString;
-        console.log(`🕐 Time Display - Heure mise à jour: "${timeString}"`);
-    }
-
+    
     updateDimensions() {
         this.dimensions = {
             width: window.innerWidth,
             height: window.innerHeight
-        };
-        console.log(`📏 Dimensions mises à jour: ${this.dimensions.width}x${this.dimensions.height}`);
+        }
     }
     
     applyResponsiveSize() {
-        if (!this.timeElement) return;
+        if (!this.timeElement) return
         
-        // 100% de la plus petite dimension
-        const fontSize = Math.min(this.dimensions.width, this.dimensions.height);
+        // Formule magique : 100% de la plus petite dimension
+        const fontSize = Math.min(this.dimensions.width, this.dimensions.height)
         
-        this.timeElement.style.fontSize = `${fontSize}px`;
+        // Espacement entre lettres responsive : configurable via settings
+        const letterSpacing = fontSize * (this.settings.letterSpacingPercent / 100)
+        console.log(`💬 Letter spacing calculation: fontSize=${fontSize}px × ${this.settings.letterSpacingPercent}% = ${letterSpacing}px`)
         
-        console.log(`📏 Taille responsive appliquée: ${fontSize}px`);
+        // Pour éviter les limites browser sur font-size, utiliser transform scale pour très petites tailles
+        if (fontSize < 12) {
+            // Utiliser une taille de base de 12px et scaler vers le bas
+            this.timeElement.style.fontSize = '12px'
+            const baseLetterSpacing = 12 * (this.settings.letterSpacingPercent / 100)
+            this.timeElement.style.letterSpacing = `${baseLetterSpacing}px`
+            // Validation immédiate de la propriété appliquée
+            const computedSpacing = window.getComputedStyle(this.timeElement).letterSpacing
+            console.log(`✅ Tiny mode letterSpacing: ${baseLetterSpacing}px, computed: ${computedSpacing}`)
+            
+            const scaleFactor = fontSize / 12
+            this.timeElement.style.transform = `scale(${scaleFactor})`
+            this.timeElement.style.transformOrigin = 'center'
+            console.log(`🔽 Tiny scaling: fontSize=12px, letterSpacing=${baseLetterSpacing}px, scale=${scaleFactor}, target=${fontSize}px`)
+        } else {
+            // Taille normale, pas besoin de transform
+            this.timeElement.style.fontSize = `${fontSize}px`
+            this.timeElement.style.letterSpacing = `${letterSpacing}px`
+            // Validation immédiate de la propriété appliquée
+            const computedSpacing = window.getComputedStyle(this.timeElement).letterSpacing
+            console.log(`✅ Applied letterSpacing: ${letterSpacing}px, computed: ${computedSpacing}`)
+            this.timeElement.style.transform = 'none'
+            console.log(`📏 Normal scaling: fontSize=${fontSize}px, letterSpacing=${letterSpacing}px`)
+        }
     }
     
     setupEventListeners() {
+        // Settings updates from MyWallpaper
+        window.addEventListener('message', (event) => {
+            if (event.data?.type === 'SETTINGS_UPDATE' && event.data?.settings) {
+                this.updateSettings(event.data.settings)
+            }
+        })
+        
+        // Window resize listener
         window.addEventListener('resize', () => {
-            this.updateDimensions();
-            this.applyResponsiveSize();
-        });
+            this.updateDimensions()
+            this.applyResponsiveSize()
+        })
     }
-
-    destroy() {
-        if (this.timeInterval) {
-            clearInterval(this.timeInterval);
+    
+    updateSettings(newSettings) {
+        console.log('🔧 Updating settings:', newSettings)
+        
+        const oldFontUrl = this.settings.fontUrl
+        // Merge settings
+        Object.assign(this.settings, newSettings)
+        
+        // Load new font if URL changed
+        if (oldFontUrl !== this.settings.fontUrl && this.settings.fontUrl) {
+            this.loadCustomFont()
+        } else {
+            this.updateStyles()
+            this.updateDisplay()
+            this.applyResponsiveSize() // Recalcule la taille ET l'espacement
         }
     }
+    
+    loadCustomFont() {
+        if (!this.settings.fontUrl) return
+        
+        // Remove existing font
+        const existingLink = document.querySelector('link[data-custom-font]')
+        if (existingLink) existingLink.remove()
+        
+        // Create font link element
+        const fontLink = document.createElement('link')
+        fontLink.rel = 'stylesheet'
+        fontLink.href = this.settings.fontUrl
+        fontLink.setAttribute('data-custom-font', 'true')
+        
+        fontLink.onload = () => {
+            this.updateStyles()
+            this.applyResponsiveSize()
+        }
+        
+        document.head.appendChild(fontLink)
+    }
+    
+    updateStyles() {
+        // Apply only configurable styles
+        this.container.style.fontFamily = this.settings.fontFamily
+        this.container.style.color = this.settings.textColor
+        this.container.setAttribute('lang', this.settings.language)
+    }
+    
+    startUpdating() {
+        this.updateDisplay()
+        
+        // Update every second for time changes
+        setInterval(() => {
+            this.updateDisplay()
+        }, 1000)
+    }
+    
+    updateDisplay() {
+        const now = new Date()
+        const locale = this.settings.language
+        
+        try {
+            let timeString
+            if (this.settings.timeFormat === '12h') {
+                timeString = now.toLocaleTimeString(locale, { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true
+                })
+            } else {
+                timeString = now.toLocaleTimeString(locale, { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false
+                })
+            }
+            this.timeElement.textContent = timeString
+        } catch (error) {
+            console.error('Error updating display:', error)
+            let timeString
+            if (this.settings.timeFormat === '12h') {
+                timeString = now.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true
+                })
+            } else {
+                timeString = now.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false
+                })
+            }
+            this.timeElement.textContent = timeString
+        }
+    }
+    
+    destroy() {
+        const fontLink = document.querySelector('link[data-custom-font]')
+        if (fontLink) fontLink.remove()
+    }
 }
 
-// Initialiser l'addon quand le DOM est prêt
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        window.timeDisplay = new TimeDisplayAddon();
-    });
-} else {
-    window.timeDisplay = new TimeDisplayAddon();
-}
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.timeDisplay = new TimeDisplayAddon()
+})
